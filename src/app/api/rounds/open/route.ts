@@ -5,7 +5,6 @@ import {getAuthorizedUser} from "@/app/_lib/auth";
 import {getNewestOngoingMatchByRoundId} from "@/app/_lib/service/match/getNewstByRoundId";
 
 export async function GET(request: NextRequest) {
-
   const user = await getAuthorizedUser(request);
 
   try {
@@ -13,10 +12,11 @@ export async function GET(request: NextRequest) {
 
     const ongoingMatch = await getNewestOngoingMatchByRoundId(round.id)
 
-    return NextResponse.json({roundId: round.id, ongoingMatchId: ongoingMatch?.id}, {status: STATUS.OK});
+    return NextResponse.json({
+      roundId: round.id,
+      ongoingMatchId: ongoingMatch?.id || null
+    }, {status: STATUS.OK});
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({error: "Failed to fetch round."}, {status: STATUS.BadRequest});
+    return NextResponse.json({error: 'No open round found'}, {status: STATUS.NotFound});
   }
-  
 }

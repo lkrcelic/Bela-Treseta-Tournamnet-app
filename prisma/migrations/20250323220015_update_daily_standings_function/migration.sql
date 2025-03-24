@@ -25,7 +25,7 @@ RETURN QUERY WITH round_results AS (
             SUM(sub.active_round_count) AS active_round_count
         FROM (
             SELECT r.team1_id AS team_id,
-                   COUNT(CASE WHEN r.active = false THEN 1 END) AS rounds_played,
+                   COUNT(CASE WHEN r.open = false THEN 1 END) AS rounds_played,
                    COUNT(CASE WHEN r.team1_wins > r.team2_wins AND r.open = false THEN 1 END) AS wins,
                    COUNT(CASE WHEN r.team1_wins = r.team2_wins AND r.open = false THEN 1 END) AS draws,
                    COUNT(CASE WHEN r.team1_wins < r.team2_wins AND r.open = false THEN 1 END) AS losses,
@@ -40,7 +40,7 @@ RETURN QUERY WITH round_results AS (
             UNION ALL
 
             SELECT r.team2_id AS team_id,
-                   COUNT(CASE WHEN r.active = false THEN 1 END) AS rounds_played,
+                   COUNT(CASE WHEN r.open = false THEN 1 END) AS rounds_played,
                    COUNT(CASE WHEN r.team2_wins > r.team1_wins AND r.open = false THEN 1 END) AS wins,
                    COUNT(CASE WHEN r.team2_wins = r.team1_wins AND r.open = false THEN 1 END) AS draws,
                    COUNT(CASE WHEN r.team2_wins < r.team1_wins AND r.open = false THEN 1 END) AS losses,
@@ -68,6 +68,7 @@ RETURN QUERY WITH round_results AS (
             WHERE lr.league_id = p_league_id
               AND r.round_date::DATE = p_round_date
               AND r.team1_id NOT IN (50, 0)
+              AND r.open = false
             GROUP BY r.team1_id
 
             UNION ALL
@@ -81,6 +82,7 @@ RETURN QUERY WITH round_results AS (
             WHERE lr.league_id = p_league_id
               AND r.round_date::DATE = p_round_date
               AND r.team2_id NOT IN (50, 0)
+              AND r.open = false
             GROUP BY r.team2_id
         ) AS mp
         GROUP BY mp.team_id
